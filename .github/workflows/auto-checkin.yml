@@ -4,7 +4,7 @@ name: auto-checkin
 on:
   schedule:
      # 6个小时一次
-    - cron: '0 0,3,6,9,12,15,18,21 * * *'
+    - cron: '*/361 * * * *'
   workflow_dispatch:
 jobs:
   build:
