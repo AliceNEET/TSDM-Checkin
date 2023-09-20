@@ -22,10 +22,11 @@ def read_config(config_file):
         config = toml.loads(env)
     cookies = config.get("COOKIES")
     url = config.get("URL")
+    pushtoken = config.get("PUSHTOKEN")
     if not cookies or not url:
         logger.error("未在配置文件找到用户cookie或者天使动漫网址")
         return
-    return (cookies, url.get("base_url"),)
+    return (cookies, url.get("base_url"),pushtoken.get("token"))
 
 
 def tsdm_login(cookie):
@@ -50,7 +51,7 @@ def tsdm_work(session):
     tips = Selector(text=response.text).xpath('//*[@id="messagetext"]/p[1]/text()')
     if tips:
         logger.info("打工%s" % "".join(tips.getall()))
-        return
+        return None
     for n in range(1, 7):
         session.post(work_url, data={"act": "clickad"})
         logger.info("正在点击第%s广告" % n)
@@ -61,6 +62,7 @@ def tsdm_work(session):
         .re("<p>(.*?)<br>(.*?)<script")
     )
     logger.info(message)
+    return message
 
 
 def checkin(session):
@@ -70,22 +72,26 @@ def checkin(session):
         Selector(text=response.text).xpath('//*[@id="qiandao"]/input/@value').get()
     )
     if not from_hash:
-        return True
+        return "TSDM已经签到"
     checkin_api = urljoin(
         base_url, "plugin.php?id=dsu_paulsign:sign&operation=qiandao&infloat=1&inajax=1"
     )
     data = {"formhash": from_hash, "qdxq": "ch", "qdmode": 3, "fastreply": 0}
     checkin_response = session.post(checkin_api, data=data)
     logger.info("TSDM签到成功")
+    return "TSDM签到成功"
 
 def main():
     global base_url
-    cookies, base_url = read_config("config.toml")
+    cookies, base_url,pushToken = read_config("config.toml")
     for user, cookie in cookies.items():
         session = tsdm_login(cookie)
         if session:
-            checkin(session)
-            tsdm_work(session)
+            msg1 = checkin(session)
+            msg2 = tsdm_work(session)
+            if pushToken != None and msg2 !=None:
+                content = "今日天使动漫论坛签到打工！\n"+msg1+"\n"+msg2
+                requests.post('https://www.pushplus.plus/send', { 'token': pushToken, 'title': '天使动漫签到', 'content': content });
 
 if __name__ == "__main__":
     main()
