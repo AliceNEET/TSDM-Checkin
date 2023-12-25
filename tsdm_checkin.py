@@ -29,6 +29,21 @@ def read_config(config_file):
     return (cookies, url.get("base_url"),pushtoken.get("token"))
 
 
+def tsdm_visit():
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.36 Safari/537.36 Edg/97.0.1072.28"
+    }
+    url = "https://www.tsdm39.com/?fromuid=296313"
+    response = requests.get(url,headers=headers)
+    if response.status_code == 200:
+        
+        res = requests.get(response.url,headers=headers)
+        if res.status_code == 200:
+            print("重定向成功。\n")
+    else:
+        print("请求失败，状态码：", response.status_code)
+
+
 def tsdm_login(cookie):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.36 Safari/537.36 Edg/97.0.1072.28",
@@ -94,4 +109,6 @@ def main():
                 requests.post('https://www.pushplus.plus/send', { 'token': pushToken, 'title': '天使动漫签到', 'content': content });
 
 if __name__ == "__main__":
+    tsdm_visit()
+    exit()
     main()
