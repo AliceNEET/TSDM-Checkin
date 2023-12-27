@@ -33,7 +33,7 @@ def tsdm_visit():
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.36 Safari/537.36 Edg/97.0.1072.28"
     }
-    url = "https://www.tsdm39.com/?fromuid=296313"
+    url = "https://www.tsdm39.net/forum.php?mod=viewthread&tid=854684&fromuid=296313"
     response = requests.get(url,headers=headers)
     if response.status_code == 200:
         
